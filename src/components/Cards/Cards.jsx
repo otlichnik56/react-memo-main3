@@ -5,6 +5,7 @@ import styles from "./Cards.module.css";
 import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
+import { useEasyMode } from "../../hooks/useEasyMode";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
@@ -41,6 +42,15 @@ function getTimerValue(startDate, endDate) {
  * previewSeconds - сколько секунд пользователь будет видеть все карты открытыми до начала игры
  */
 export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
+
+  // Состояние "лёгкий режим"
+  const { easyMode, setEasyMode } = useEasyMode();
+  // Определение количества игр
+  const [ countGame, setCountGame ] = useState(easyMode ? 3 : 1);
+
+  //console.log(easyMode);
+  //console.log(countGame);
+
   // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
   const [cards, setCards] = useState([]);
   // Текущий статус игры
@@ -73,6 +83,16 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     setGameEndDate(null);
     setTimer(getTimerValue(null, null));
     setStatus(STATUS_PREVIEW);
+    setCountGame(easyMode ? 3 : 1); // Сбросить количество игр
+    setCards(() => {
+      return shuffle(generateDeck(pairsCount, 10));
+    });
+  }
+  function closeAllCards() {
+    setCards(cards.map(card => ({
+      ...card,
+      open: false,
+    })));
   }
 
   /**
@@ -127,8 +147,22 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
     // "Игрок проиграл", т.к на поле есть две открытые карты без пары
     if (playerLost) {
-      finishGame(STATUS_LOST);
-      return;
+      if (easyMode) {
+        setTimeout(() => {
+          setCountGame(prevState => {
+            const newCountGame = prevState - 1;
+            if (newCountGame > 0) {
+              closeAllCards();
+            } else {
+              finishGame(STATUS_LOST);
+            }
+            return newCountGame;
+          });
+        }, 500); // Задержка в 0.5 секунду перед уменьшением счётчика
+      } else {
+        finishGame(STATUS_LOST);
+        return;
+      }
     }
 
     // ... игра продолжается
@@ -172,6 +206,13 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
     };
   }, [gameStartDate, gameEndDate]);
 
+  // Проверка количества жизней
+  useEffect(() => {
+    if (countGame === 0){
+      finishGame(STATUS_LOST);
+    }
+  }, [countGame]);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -209,6 +250,12 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           />
         ))}
       </div>
+
+      {easyMode && 
+        <div className={styles.count}>
+          <p>Осталось попыток: {countGame}</p>
+        </div>      
+      }
 
       {isGameEnded ? (
         <div className={styles.modalContainer}>
