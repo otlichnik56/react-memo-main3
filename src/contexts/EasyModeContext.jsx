@@ -12,5 +12,3 @@ export const EasyModeProvider = ({ children }) => {
         </EasyModeContext.Provider>
     );
 };
-
-//export default EasyModeProvider;

@@ -1,0 +1,93 @@
+body {
+    background-color: #003366;
+    font-family: StratosSkyeng;
+    font-size: 24px;
+    font-style: normal;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    font-family: Poppins, sans-serif;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 944px;
+    margin: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 52px;
+    margin-bottom: 18px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-weight: 400;
+    font-size: 24px;
+    font-style: normal;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px; /* расстояние между строками */
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-style: normal;
+}
+
+.row {
+    background-color: #fff;
+    color: #000;
+    overflow: hidden; /* для корректного отображения закругленных углов */
+    height: 64px;
+}
+
+th, td {
+    padding: 10px;
+    padding-left: 25px;
+    border: none;
+    text-align: left; /* выравнивание текста по левой стороне */
+}
+
+th {
+    background-color: #fff;
+    color: #999999;
+    height: 50px;
+}
+
+.row td:first-child, th:first-child {
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+}
+
+.row td:last-child, th:last-child {
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.startButton {
+    padding: 10px 20px;
+    background-color: #8bc34a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 246px;
+    height: 50px;
+    font-size: 24px;
+    border-radius: 12px;
+}
+
+.startButton:hover {
+    background-color: #7cb342;
+}
