@@ -1,12 +1,15 @@
 .modal {
   width: 480px;
-  height: 459px;
   border-radius: 12px;
   background: #c2f5ff;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.tb {
+  height: 32px;
 }
 
 .image {
@@ -23,8 +26,6 @@
   font-style: normal;
   font-weight: 400;
   line-height: 48px;
-
-  margin-bottom: 28px;
 }
 
 .description {
@@ -48,4 +49,38 @@
   line-height: 72px;
 
   margin-bottom: 40px;
+}
+
+.input{
+  width: 246px;
+  height: 48px;
+  border-radius: 12px;
+  background: #fff;
+  color: #999999;
+  text-align: center;
+  font-family: StratosSkyeng;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px; /* 133.333% */
+  border: none;
+  cursor: pointer;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.link {
+  /* Стили для ссылки */
+  display: inline-block;
+  margin-top: 24px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  font-family: StratosSkyeng;
+  font-size: 18px;
+  color: #565EEF;
+}
+
+.link:hover {
+  text-decoration: underline;
 }
