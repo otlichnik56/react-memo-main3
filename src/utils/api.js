@@ -9,4 +9,19 @@ export async function getLeaders() {
     }
     const leaders = await response.json();
     return leaders;
+}
+
+export async function postLeader({ name, time }) {
+  const response = await fetch(baseHost, {
+    method: "POST",
+    body: JSON.stringify({
+      name: name,
+      time: time
+    }),
+  });
+  if(!response.ok){
+    throw Error("Ошибка сервера, он устал");
   }
+  const leaders = await response.json();
+  return leaders;
+}

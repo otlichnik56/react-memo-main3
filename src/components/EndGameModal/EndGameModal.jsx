@@ -4,7 +4,7 @@ import { Button } from "../Button/Button";
 import deadImageUrl from "./images/dead.png";
 import celebrationImageUrl from "./images/celebration.png";
 import { useState, useEffect } from "react";
-import { getLeaders } from "../../utils/api";
+import { getLeaders, postLeader } from "../../utils/api";
 import { useLeaderboard } from "../../hooks/useLeaderboard";
 
 export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, onClick }) {
@@ -12,6 +12,8 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
   const [isTopLeader, setIsTopLeader] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [username, setUsername] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const gameDurationTotalSeconds = gameDurationMinutes * 60 + gameDurationSeconds;
 
   useEffect(() => {
@@ -30,6 +32,18 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
         });
     }
   }, [gameDurationTotalSeconds, leaderboard, setLeaderboard]);
+
+  const handleSubmit = () => {
+    if (username.trim()) {
+      postLeader({ name: username, time: gameDurationTotalSeconds })
+        .then(() => {
+          setSubmitted(true);
+        })
+        .catch(error => {
+          setError(error);
+        });
+    }
+  };
 
   const title = isWon ? "Вы победили!" : "Вы проиграли!";
   const imgSrc = isWon ? celebrationImageUrl : deadImageUrl;
@@ -50,11 +64,22 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
         <>
           <h2 className={styles.title}>Вы понали</h2>
           <h2 className={styles.title}>на Лидерборд</h2>
-          <input
-            type="text"
-            className={styles.input}
-            placeholder="Пользователь"
-          />
+          {!submitted ? (
+            <>
+              <input
+                type="text"
+                className={styles.input}
+                placeholder="Пользователь"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <Button onClick={handleSubmit}>Отправить</Button>
+              <div className={styles.tb}></div>
+            </>
+          ) : (
+            <p className={styles.description}>Ваш результат отправлен!</p>
+          )}
+          <div className={styles.tb}></div>
         </>
         ) : (
           <h2 className={styles.title}>{title}</h2>

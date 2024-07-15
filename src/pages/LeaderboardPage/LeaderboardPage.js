@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./LeaderboardPage.module.css";
 import { getLeaders } from "../../utils/api";
+import { formatSecondsToMMSS } from "../../utils/util";
 
 export function LeaderboardPage() {
 
@@ -9,7 +10,7 @@ export function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   const mockLeaders = {
     "leaders": [
       { "id": 1, "name": "Великий маг", "time": 8000 },
@@ -71,7 +72,7 @@ export function LeaderboardPage() {
                 <tr key={entry.id} className={styles.row}>
                     <td>#{index + 1}</td>
                     <td>{entry.name}</td>
-                    <td>{entry.time}</td>
+                    <td>{formatSecondsToMMSS(entry.time)}</td>
                 </tr>
             ))}
             </tbody>
@@ -79,3 +80,4 @@ export function LeaderboardPage() {
     </div>
   );
 }
+
