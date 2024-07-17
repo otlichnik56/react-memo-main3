@@ -57,6 +57,10 @@ th, td {
     padding-left: 25px;
     border: none;
     text-align: left; /* выравнивание текста по левой стороне */
+    background-color: #fff;
+    color: #000;
+    overflow: hidden; /* для корректного отображения закругленных углов */
+    height: 64px;
 }
 
 th {
@@ -65,12 +69,12 @@ th {
     height: 50px;
 }
 
-.row td:first-child, th:first-child {
+td:first-child, th:first-child {
     border-bottom-left-radius: 8px;
     border-top-left-radius: 8px;
 }
 
-.row td:last-child, th:last-child {
+td:last-child, th:last-child {
     border-bottom-right-radius: 8px;
     border-top-right-radius: 8px;
 }

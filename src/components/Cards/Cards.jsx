@@ -6,13 +6,14 @@ import { EndGameModal } from "../../components/EndGameModal/EndGameModal";
 import { Button } from "../../components/Button/Button";
 import { Card } from "../../components/Card/Card";
 import { useEasyMode } from "../../hooks/useEasyMode";
+import imageUrl from "./images/super.png";
 
 // Игра закончилась
 const STATUS_LOST = "STATUS_LOST";
 const STATUS_WON = "STATUS_WON";
 // Идет игра: карты закрыты, игрок может их открыть
 const STATUS_IN_PROGRESS = "STATUS_IN_PROGRESS";
-// Начало игры: игрок видит все карты в течении нескольких секунд
+// Начало игры: игрок видит все карты в течение нескольких секунд
 const STATUS_PREVIEW = "STATUS_PREVIEW";
 
 function getTimerValue(startDate, endDate) {
@@ -27,9 +28,9 @@ function getTimerValue(startDate, endDate) {
     endDate = new Date();
   }
 
-  const diffInSecconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
-  const minutes = Math.floor(diffInSecconds / 60);
-  const seconds = diffInSecconds % 60;
+  const diffInSeconds = Math.floor((endDate.getTime() - startDate.getTime()) / 1000);
+  const minutes = Math.floor(diffInSeconds / 60);
+  const seconds = diffInSeconds % 60;
   return {
     minutes,
     seconds,
@@ -46,38 +47,87 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
   // Состояние "лёгкий режим"
   const { easyMode, setEasyMode } = useEasyMode();
   // Определение количества игр
-  const [ countGame, setCountGame ] = useState(easyMode ? 3 : 1);
+  const [countGame, setCountGame] = useState(easyMode ? 3 : 1);
 
-  //console.log(easyMode);
-  //console.log(countGame);
+  // Использование суперсилы
+  const [superGame, setSuperGame] = useState(false);
 
-  // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
-  const [cards, setCards] = useState([]);
-  // Текущий статус игры
-  const [status, setStatus] = useState(STATUS_PREVIEW);
+  // Состояние для определения, кликабельна ли картинка суперсилы
+  const [superClickable, setSuperClickable] = useState(true);
 
   // Дата начала игры
   const [gameStartDate, setGameStartDate] = useState(null);
   // Дата конца игры
   const [gameEndDate, setGameEndDate] = useState(null);
 
-  // Стейт для таймера, высчитывается в setInteval на основе gameStartDate и gameEndDate
+  // Стейт для таймера, высчитывается в setInterval на основе gameStartDate и gameEndDate
   const [timer, setTimer] = useState({
     seconds: 0,
     minutes: 0,
   });
 
-  function finishGame(status = STATUS_LOST) {
+  // Стейт для остановки таймера
+  const [isPaused, setIsPaused] = useState(false);
+
+  // В cards лежит игровое поле - массив карт и их состояние открыта\закрыта
+  const [cards, setCards] = useState([]);
+  // Текущий статус игры
+  const [status, setStatus] = useState(STATUS_PREVIEW);
+
+  // Состояние для сохранения исходного состояния карт
+  const [previousCards, setPreviousCards] = useState([]);
+
+  // Эффект для обработки суперсилы
+  useEffect(() => {
+    if (superGame) {
+      setSuperClickable(false); // Делаем картинку некликабельной
+      setIsPaused(true); // Останавливаем таймер
+      // Сохраняем текущее состояние карт
+      setPreviousCards(cards.map(card => ({ ...card })));
+    }
+  }, [superGame]);
+
+  useEffect(() => {
+    if (previousCards.length > 0) {
+      // Открываем все карты
+      setCards(cards.map(card => ({
+        ...card,
+        open: true,
+      })));
+
+      setTimeout(() => {
+        //setSuperClickable(true); // Снова делаем картинку кликабельной
+        setSuperGame(true); // Отключаем суперсилу
+        setIsPaused(false); // Возобновляем таймер
+        setCards(previousCards); // Возвращаем карты в исходное состояние
+        setPreviousCards([]); // Очистить состояние предыдущих карт
+      }, 5000);
+    }
+  }, [previousCards]);
+
+  // Функция-обработчик для изменения состояния
+  const handleChangeSuper = () => {
+    if (!superClickable) return; // Если картинка не кликабельна, ничего не делаем
+    setSuperGame(true);
+  };
+
+
+
+  function finishGame(status) {
     setGameEndDate(new Date());
-    setStatus(status);
+    setStatus(status);    
   }
+
   function startGame() {
     const startDate = new Date();
     setGameEndDate(null);
     setGameStartDate(startDate);
     setTimer(getTimerValue(startDate, null));
     setStatus(STATUS_IN_PROGRESS);
+    setSuperClickable(true);
+    setSuperGame(false);
   }
+
   function resetGame() {
     setGameStartDate(null);
     setGameEndDate(null);
@@ -88,6 +138,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
       return shuffle(generateDeck(pairsCount, 10));
     });
   }
+
   function closeAllCards() {
     setCards(cards.map(card => ({
       ...card,
@@ -97,7 +148,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
   /**
    * Обработка основного действия в игре - открытие карты.
-   * После открытия карты игра может пепереходит в следующие состояния
+   * После открытия карты игра может перейти в следующие состояния
    * - "Игрок выиграл", если на поле открыты все карты
    * - "Игрок проиграл", если на поле есть две открытые карты без пары
    * - "Игра продолжается", если не случилось первых двух условий
@@ -158,7 +209,7 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
             }
             return newCountGame;
           });
-        }, 500); // Задержка в 0.5 секунду перед уменьшением счётчика
+        }, 500); // Задержка в 0.5 секунды перед уменьшением счётчика
       } else {
         finishGame(STATUS_LOST);
         return;
@@ -198,13 +249,15 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
 
   // Обновляем значение таймера в интервале
   useEffect(() => {
+    if (isPaused) return; // Если игра на паузе, не обновляем таймер
+
     const intervalId = setInterval(() => {
       setTimer(getTimerValue(gameStartDate, gameEndDate));
     }, 300);
     return () => {
       clearInterval(intervalId);
     };
-  }, [gameStartDate, gameEndDate]);
+  }, [gameStartDate, gameEndDate, isPaused]);
 
   // Проверка количества жизней
   useEffect(() => {
@@ -225,18 +278,32 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
           ) : (
             <>
               <div className={styles.timerValue}>
-                <div className={styles.timerDescription}>min</div>
-                <div>{timer.minutes.toString().padStart("2", "0")}</div>
+                <div className={styles.timerDescription}>мин</div>
+                <div>{timer.minutes.toString().padStart(2, "0")}</div>
               </div>
               .
               <div className={styles.timerValue}>
-                <div className={styles.timerDescription}>sec</div>
-                <div>{timer.seconds.toString().padStart("2", "0")}</div>
+                <div className={styles.timerDescription}>сек</div>
+                <div>{timer.seconds.toString().padStart(2, "0")}</div>
               </div>
             </>
           )}
         </div>
-        {status === STATUS_IN_PROGRESS ? <Button onClick={resetGame}>Начать заново</Button> : null}
+
+        {status === STATUS_IN_PROGRESS ? (
+          <>            
+            <div className={`${styles.super} ${!superClickable ? styles.disabled : ''}`}>
+              <img 
+                src={imageUrl} 
+                alt="Суперсила" 
+                onClick={handleChangeSuper} 
+                style={{ filter: !superClickable ? "brightness(50%)" : "none" }}
+              />
+            </div>
+            <Button onClick={resetGame}>Начать заново</Button> 
+          </>
+        ) : null}
+
       </div>
 
       <div className={styles.cards}>
@@ -263,6 +330,8 @@ export function Cards({ pairsCount = 3, previewSeconds = 5 }) {
             isWon={status === STATUS_WON}
             gameDurationSeconds={timer.seconds}
             gameDurationMinutes={timer.minutes}
+            easyMode={easyMode}
+            superGame={superGame}
             onClick={resetGame}
           />
         </div>

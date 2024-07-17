@@ -10,10 +10,10 @@ export function SelectLevelPage() {
   const navigate = useNavigate();
   const [selectedLevel, setSelectedLevel] = useState(1); // уровень по умолчанию - 1
 
-  /**
+  
   useEffect(() => {
     console.log("Leaderboard state updated:", leaderboard);
-  }, [leaderboard]);*/
+  }, [leaderboard]);
 
   const handleEasyModeChange = (event) => {
     setEasyMode(event.target.checked);

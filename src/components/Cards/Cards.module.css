@@ -32,6 +32,17 @@
   margin-bottom: 35px;
 }
 
+.super {
+  display: flex;
+  width: 48px;
+  height: 48px;
+}
+
+img{
+  width: 48px;
+  height: 48px;
+}
+
 .timer {
   display: flex;
   align-items: end;

@@ -7,7 +7,11 @@ import { useState, useEffect } from "react";
 import { getLeaders, postLeader } from "../../utils/api";
 import { useLeaderboard } from "../../hooks/useLeaderboard";
 
-export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, onClick }) {
+export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, easyMode, superGame, onClick }) {
+
+  //console.log("easyMode" + easyMode);
+  //console.log("superGame" + superGame);  
+
   const { leaderboard, setLeaderboard } = useLeaderboard();
   const [isTopLeader, setIsTopLeader] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -16,6 +20,8 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
   const [submitted, setSubmitted] = useState(false);
   const gameDurationTotalSeconds = gameDurationMinutes * 60 + gameDurationSeconds;
 
+
+  //console.log("leaderboard" + leaderboard);
   useEffect(() => {
     if (leaderboard && isWon) {
       getLeaders()
@@ -35,7 +41,11 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
 
   const handleSubmit = () => {
     if (username.trim()) {
-      postLeader({ name: username, time: gameDurationTotalSeconds })
+      const achievements = [];
+      if (!easyMode) achievements.push(1);
+      if (!superGame) achievements.push(2);
+
+      postLeader({ name: username, time: gameDurationTotalSeconds, achievements: achievements })
         .then(() => {
           setSubmitted(true);
         })
@@ -62,7 +72,7 @@ export function EndGameModal({ isWon, gameDurationSeconds, gameDurationMinutes, 
 
       {isTopLeader ? (
         <>
-          <h2 className={styles.title}>Вы понали</h2>
+          <h2 className={styles.title}>Вы попали</h2>
           <h2 className={styles.title}>на Лидерборд</h2>
           {!submitted ? (
             <>
